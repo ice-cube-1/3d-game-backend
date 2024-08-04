@@ -29,12 +29,14 @@ public class Server {
             container.addEndpoint(serverConfig);
         });
 
-        URL urlStatics = Thread.currentThread().getContextClassLoader().getResource("server-root/index.html");
-        Objects.requireNonNull(urlStatics, "Unable to find index.html in classpath");
+        URL urlStatics = Thread.currentThread().getContextClassLoader().getResource("server-root/index1.html");
+        Objects.requireNonNull(urlStatics, "Unable to find index1.html in classpath");
         String urlBase = urlStatics.toExternalForm().replaceFirst("/[^/]*$", "/");
         ServletHolder defHolder = new ServletHolder("default", new DefaultServlet());
-        defHolder.setInitParameter("resourceBase", urlBase);
+        defHolder.setInitParameter("resourceBase", "C:\\git\\webgl-random\\web");
         defHolder.setInitParameter("dirAllowed", "true");
+        defHolder.setInitParameter("cacheControl", "no-store, no-cache, must-revalidate, max-age=0");
+        defHolder.setInitParameter("useFileMappedBuffer", "false");
         servletContextHandler.addServlet(defHolder, "/");
         return server;
     }

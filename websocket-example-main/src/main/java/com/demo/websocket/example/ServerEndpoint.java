@@ -6,6 +6,8 @@ import jakarta.websocket.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.stream.Collectors;
+
 
 public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<String>
 {
@@ -30,7 +32,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
         this.remote = this.session.getAsyncRemote();
         LOG.info("WebSocket Open: {}", session);
         session.addMessageHandler(this);
-        this.remote.sendText(World.messages);
+        this.remote.sendText(String.join("<br/>", World.messages));
         World.connections.add(this);
     }
 
@@ -45,9 +47,9 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     public void onMessage(String message)
     {
         LOG.info("Added [{}]", message);
-        World.messages = World.messages+"<br/>"+message;
+        World.messages.add(message);
         for (ServerEndpoint endpoint : World.connections) {
-            endpoint.remote.sendText(World.messages);
+            endpoint.remote.sendText(String.join("<br/>", World.messages));
         }
     }
 }
