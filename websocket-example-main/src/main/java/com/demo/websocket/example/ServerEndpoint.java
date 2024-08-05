@@ -6,7 +6,9 @@ import jakarta.websocket.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.stream.Collectors;
+import java.util.List;
+
+import static java.lang.String.valueOf;
 
 
 public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<String>
@@ -14,6 +16,8 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     private static final Logger LOG = LoggerFactory.getLogger(ServerEndpoint.class);
     private Session session;
     private RemoteEndpoint.Async remote;
+    public PlayerInfo stats = new PlayerInfo();
+    private String id;
 
     @Override
     public void onClose(Session session, CloseReason close)
@@ -30,9 +34,24 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     {
         this.session = session;
         this.remote = this.session.getAsyncRemote();
+        this.id = valueOf(World.connections.size());
         LOG.info("WebSocket Open: {}", session);
         session.addMessageHandler(this);
-        this.remote.sendText(String.join("<br/>", World.messages));
+        sendMessage(this.id, "id", this.id);
+        if (World.messages.size() <= 40) {
+            sendMessageListToClient(World.messages,"message", this.id);
+        } else {
+            sendMessageListToClient(World.messages.subList(World.messages.size() - 40, World.messages.size()),"message", this.id);
+        }
+        for (ServerEndpoint player: World.connections) {
+            System.out.println(player.stats.sendAll());
+            sendMessage(player.stats.sendAll(), "playerStats", player.id);
+        }
+        sendMessageToOthers(this.stats.sendAll(), "playerStats", this.id);
+        sendMessageListToClient(Terrain.readBlocks(),"blocks", this.id);
+        System.out.println(Terrain.readWeapon());
+        System.out.println(Terrain.readBlocks());
+        sendMessageListToClient(Terrain.readWeapon(),"weapon",this.id);
         World.connections.add(this);
     }
 
@@ -46,10 +65,55 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     @Override
     public void onMessage(String message)
     {
-        LOG.info("Added [{}]", message);
+        String[] parts = message.split(": ", 3); // 0: type, 1: content
+        switch (parts[1]) {
+            case "message":
+                handleMessage(parts[2], parts[0]);
+                break;
+            case "position":
+                updatePosition(parts[2], parts[0]);
+                break;
+            case "weaponPickup":
+                updateWeapon(parts[2], parts[0]);
+                break;
+            case "zspeed":
+                copySpeed(parts[2], "zspeed", Integer.parseInt(parts[0]));
+        }
+    }
+    public void updatePosition(String position, String id) {
+        this.stats.position = position;
+        sendMessageToOthers(position, "position", id);
+    }
+    public void updateWeapon(String weaponInfo, String id) {
+        String[] parts = weaponInfo.split(" - ", 2);
+        Terrain.removeWeapon(parts[0]);
+        Terrain.addWeapon(parts[1]);
+        this.stats.weaponChoice = parts[0];
+        sendMessageToOthers(weaponInfo, "weaponPickup", id);
+    }
+    public void handleMessage(String message, String id) {
         World.messages.add(message);
-        for (ServerEndpoint endpoint : World.connections) {
-            endpoint.remote.sendText(String.join("<br/>", World.messages));
+        sendMessageToOthers(message, "message", id);
+    }
+    public void copySpeed(String message,String type, int id) {
+        World.connections.get(id).remote.sendText(id+": "+type+": "+message);
+    }
+    public void sendMessageToOthers(String message, String type, String id)
+    {
+        for (ServerEndpoint endpoint: World.connections) {
+            if (endpoint.remote != this.remote) {
+                endpoint.remote.sendText(id+": "+type+": "+message);
+            }
+        }
+    }
+    public void sendMessageListToClient(List<String> messages, String type, String id) {
+        for (String message: messages) {
+            this.remote.sendText(id+": "+type+": "+message);
+        }
+    }
+    public void sendMessage(String message, String type, String id) {
+        if (message!="") {
+            this.remote.sendText(id + ": " + type + ": " + message);
         }
     }
 }

@@ -12,11 +12,11 @@ import java.util.Objects;
 public class Server {
     public static void main(String[] args) throws Exception
     {
+        new Terrain();
         org.eclipse.jetty.server.Server server = newServer(8080);
         server.start();
         server.join();
     }
-
     public static org.eclipse.jetty.server.Server newServer(int port)
     {
         org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(port);
@@ -28,7 +28,6 @@ public class Server {
             ServerEndpointConfig serverConfig = ServerEndpointConfig.Builder.create(ServerEndpoint.class, "/socket").build();
             container.addEndpoint(serverConfig);
         });
-
         URL urlStatics = Thread.currentThread().getContextClassLoader().getResource("server-root/index1.html");
         Objects.requireNonNull(urlStatics, "Unable to find index1.html in classpath");
         String urlBase = urlStatics.toExternalForm().replaceFirst("/[^/]*$", "/");
