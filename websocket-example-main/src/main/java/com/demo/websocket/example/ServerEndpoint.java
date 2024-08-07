@@ -78,6 +78,10 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 break;
             case "zspeed":
                 copySpeed(parts[2], "zspeed", Integer.parseInt(parts[0]));
+                break;
+            case "death":
+                kill(parts[0]);
+                break;
         }
     }
     public void updatePosition(String position, String id) {
@@ -98,12 +102,20 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     public void copySpeed(String message,String type, int id) {
         World.connections.get(id).remote.sendText(id+": "+type+": "+message);
     }
+    public void kill(String id) {
+        sendMessageToAll(id+" has been killed","message");
+    }
     public void sendMessageToOthers(String message, String type, String id)
     {
         for (ServerEndpoint endpoint: World.connections) {
             if (endpoint.remote != this.remote) {
                 endpoint.remote.sendText(id+": "+type+": "+message);
             }
+        }
+    }
+    public void sendMessageToAll(String message, String type) {
+        for (ServerEndpoint endpoint: World.connections) {
+            endpoint.remote.sendText("0: "+type+": "+message);
         }
     }
     public void sendMessageListToClient(List<String> messages, String type, String id) {
