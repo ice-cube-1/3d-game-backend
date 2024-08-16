@@ -32,7 +32,7 @@ public class Terrain {
         if (x < 0.1) {
             addMore(i, z + 2, j); // Recursive call
         } else if (x < 0.15) {
-            weapons.add(i + ", " + z+2 + ", " + j + ", " + Math.floor(random.nextDouble() * 5));
+            weapons.add(i + ", " + z+2 + ", " + j + ", " + Math.floor(random.nextDouble() * 5)+", "+Math.floor(random.nextDouble() * 3));
         }
     }
     public static List<String> readWeapon() {
