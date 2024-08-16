@@ -79,14 +79,15 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
             case "zspeed":
                 copySpeed(parts[2], "zspeed", Integer.parseInt(parts[0]));
                 break;
-            case "death":
-                kill(parts[0]);
-                break;
             case "weaponPos":
                 sendMessageToOthers(parts[2], parts[1], parts[0]);
                 break;
             case "login":
                 handleLogin(parts[2], parts[0]);
+                break;
+            case "hp":
+                copySpeed(parts[2], "hp", Integer.parseInt(parts[0]));
+                this.stats.hp = parts[2];
                 break;
             default:
                 System.out.println(Arrays.toString(parts));
@@ -110,9 +111,6 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     }
     public void copySpeed(String message,String type, int id) {
         World.connections.get(id).remote.sendText(id+": "+type+": "+message);
-    }
-    public void kill(String id) {
-        sendMessageToAll(id+" has been killed","message");
     }
     public void handleLogin(String loginInfo, String id) {
         List<String> userPass = List.of(loginInfo.split(" "));
@@ -142,11 +140,6 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
             if (endpoint.remote != this.remote) {
                 endpoint.remote.sendText(id+": "+type+": "+message);
             }
-        }
-    }
-    public void sendMessageToAll(String message, String type) {
-        for (ServerEndpoint endpoint: World.connections) {
-            endpoint.remote.sendText("0: "+type+": "+message);
         }
     }
     public void sendMessageListToClient(List<String> messages, String type, String id) {

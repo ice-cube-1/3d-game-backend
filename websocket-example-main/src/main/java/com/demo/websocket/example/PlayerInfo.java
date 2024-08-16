@@ -5,9 +5,10 @@ public class PlayerInfo {
     public String weaponChoice = "0, 0, 0, 0, 0";
     public String name = "unknown";
     public String password = "password";
+    public String hp = "10";
     public String sendAll() {
         if (position!=null && weaponChoice!=null) {
-            return "position:"+ position+" - weaponChoice:"+weaponChoice+" - name:"+name;
+            return "position:"+ position+" - weaponChoice:"+weaponChoice+" - name:"+name+" - hp:"+hp;
         }
         return "";
     }
