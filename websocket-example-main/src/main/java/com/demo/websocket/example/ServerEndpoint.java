@@ -6,6 +6,7 @@ import jakarta.websocket.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static java.lang.String.valueOf;
@@ -44,13 +45,10 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
             sendMessageListToClient(World.messages.subList(World.messages.size() - 40, World.messages.size()),"message", this.id);
         }
         for (ServerEndpoint player: World.connections) {
-            System.out.println(player.stats.sendAll());
             sendMessage(player.stats.sendAll(), "playerStats", player.id);
         }
         sendMessageToOthers(this.stats.sendAll(), "playerStats", this.id);
         sendMessageListToClient(Terrain.readBlocks(),"blocks", this.id);
-        System.out.println(Terrain.readWeapon());
-        System.out.println(Terrain.readBlocks());
         sendMessageListToClient(Terrain.readWeapon(),"weapon",this.id);
         World.connections.add(this);
     }
@@ -74,6 +72,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 updatePosition(parts[2], parts[0]);
                 break;
             case "weaponPickup":
+                System.out.println(Arrays.toString(parts));
                 updateWeapon(parts[2], parts[0]);
                 break;
             case "zspeed":
@@ -81,6 +80,12 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 break;
             case "death":
                 kill(parts[0]);
+                break;
+            case "weaponPos":
+                sendMessageToOthers(parts[2], parts[1], parts[0]);
+                break;
+            default:
+                System.out.println(Arrays.toString(parts));
                 break;
         }
     }
