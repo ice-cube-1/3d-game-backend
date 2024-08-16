@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static java.lang.String.valueOf;
 
@@ -84,6 +85,9 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
             case "weaponPos":
                 sendMessageToOthers(parts[2], parts[1], parts[0]);
                 break;
+            case "login":
+                handleLogin(parts[2], parts[0]);
+                break;
             default:
                 System.out.println(Arrays.toString(parts));
                 break;
@@ -109,6 +113,28 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     }
     public void kill(String id) {
         sendMessageToAll(id+" has been killed","message");
+    }
+    public void handleLogin(String loginInfo, String id) {
+        List<String> userPass = List.of(loginInfo.split(" "));
+        if (!Objects.equals(this.stats.name, "unknown")) {
+            sendMessage("logged in", "login", "0");
+            return;
+        }
+        for (ServerEndpoint Player: World.connections) {
+            if (Objects.equals(Player.stats.name, userPass.getFirst())) {
+                if (Objects.equals(Player.stats.password, userPass.get(1))) {
+                    sendMessage(Player.id, "login", Player.id);
+                    this.id = Player.id;
+                    this.stats = Player.stats;
+                } else {
+                    sendMessage("incorrect password", "login", "0");
+                }
+                return;
+            }
+        }
+        this.stats.name = userPass.getFirst();
+        this.stats.password = userPass.get(1);
+        sendMessage("account "+ userPass.get(0),"login","0");
     }
     public void sendMessageToOthers(String message, String type, String id)
     {
