@@ -131,6 +131,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                     sendMessage(Player.id, "login", Player.id);
                     this.id = Player.id;
                     this.stats = Player.stats;
+                    sendMessageToOthers(this.stats.name, "namechange", this.id);
                 } else {
                     sendMessage("incorrect password", "login", "0");
                 }
@@ -140,6 +141,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
         this.stats.name = userPass.getFirst();
         this.stats.password = userPass.get(1);
         sendMessage("account "+ userPass.get(0),"login","0");
+        sendMessageToOthers(this.stats.name, "namechange", this.id);
     }
     public void moveItem(String currentCoords) {
         String out = "0: moveItem: "+currentCoords+" - "+Terrain.emptySquare();
