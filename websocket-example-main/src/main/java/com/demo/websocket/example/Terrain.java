@@ -1,16 +1,14 @@
 package com.demo.websocket.example;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Terrain {
     // Static fields for global state
     static List<String> weapons = new ArrayList<>();
-    List<String> blocks = new ArrayList<>();
-    Random random = new Random();
-    int GRIDSIZE = 80;
+    static List<String> blocks = new ArrayList<>();
+    static Random random = new Random();
+    static int GRIDSIZE = 80;
     public Terrain() {
         initializeTerrain();
         files.write("weapons.txt",weapons);
@@ -32,7 +30,7 @@ public class Terrain {
         if (x < 0.1) {
             addMore(i, z + 2, j); // Recursive call
         } else if (x < 0.15) {
-            weapons.add(i + ", " + z+2 + ", " + j + ", " + Math.floor(random.nextDouble() * 5)+", "+Math.floor(random.nextDouble() * 4));
+            weapons.add(i + ", " + z+2 + ", " + j + ", " + Math.floor(random.nextDouble() * 5)+", "+Math.floor(random.nextDouble() * 5));
         }
     }
     public static List<String> readWeapon() {
@@ -50,5 +48,18 @@ public class Terrain {
         List<String> weapons = files.read("weapons.txt");
         weapons.remove(weapon);
         files.write("weapons.txt", weapons);
+    }
+    public static String emptySquare() {
+        ArrayList<Integer> newCoords = new ArrayList<>();
+        newCoords.add((int) Math.floor(random.nextDouble() * GRIDSIZE - GRIDSIZE / 2));
+        newCoords.add((int) Math.floor(random.nextDouble() * GRIDSIZE - GRIDSIZE / 2));
+        int z = 0;
+        for (String block : blocks) {
+            List<Integer> coords = Arrays.stream(block.split(", ")).map(Integer::parseInt).toList();
+            if (Objects.equals(coords.get(0), newCoords.get(0)) && Objects.equals(coords.get(1), newCoords.get(1))) {
+                z = coords.get(2);
+            }
+        }
+        return newCoords.get(0) +", "+z+2+", "+newCoords.get(1);
     }
 }

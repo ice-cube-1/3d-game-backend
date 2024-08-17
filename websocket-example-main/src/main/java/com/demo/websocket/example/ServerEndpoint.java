@@ -89,6 +89,9 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 copySpeed(parts[2], "hp", Integer.parseInt(parts[0]));
                 this.stats.hp = parts[2];
                 break;
+            case "moveItem":
+                moveItem(parts[2]);
+                break;
             default:
                 System.out.println(Arrays.toString(parts));
                 break;
@@ -137,6 +140,13 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
         this.stats.name = userPass.getFirst();
         this.stats.password = userPass.get(1);
         sendMessage("account "+ userPass.get(0),"login","0");
+    }
+    public void moveItem(String currentCoords) {
+        String out = "0: moveItem: "+currentCoords+" - "+Terrain.emptySquare();
+        for (ServerEndpoint endpoint: World.connections) {
+            endpoint.remote.sendText(out);
+        }
+
     }
     public void sendMessageToOthers(String message, String type, String id)
     {
