@@ -102,7 +102,11 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
         String[] parts = weaponInfo.split(" - ", 2);
         Terrain.removeWeapon(parts[0]);
         Terrain.addWeapon(parts[1]);
-        this.stats.weaponChoice = parts[0];
+        if (parts[0].substring(parts.length - 1).equals("3")) {
+            this.stats.armourChoice = parts[0];
+        } else {
+            this.stats.weaponChoice = parts[0];
+        }
         sendMessageToOthers(weaponInfo, "weaponPickup", id);
     }
     public void handleMessage(String message, String id) {
