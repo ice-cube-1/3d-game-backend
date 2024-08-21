@@ -7,13 +7,8 @@ public class PlayerInfo {
     public String name = "unknown";
     public String password = "password";
     public String hp = "40";
+    public String color = "255, 255, 255, 255";
     public String sendAll() {
-            return "position:"+ position+" - weaponChoice:"+weaponChoice+" - name:"+name+" - hp:"+hp+" - weaponChoice:"+armourChoice;
-    }
-    public Boolean checkLogin(String checkUsername, String checkPassword) {
-        if (checkPassword == password && checkUsername == name) {
-            return true;
-        }
-        return false;
+            return "position:"+ position+" - weaponChoice:"+weaponChoice+" - name:"+name+" - hp:"+hp+" - weaponChoice:"+armourChoice +" - color:"+color;
     }
 }

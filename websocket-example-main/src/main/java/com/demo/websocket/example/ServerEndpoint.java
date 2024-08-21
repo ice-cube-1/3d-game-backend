@@ -92,6 +92,10 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
             case "moveItem":
                 moveItem(parts[2]);
                 break;
+            case "color":
+                this.stats.color = parts[2];
+                sendMessageToOthers(parts[2], parts[1], parts[0]);
+                break;
             default:
                 System.out.println(Arrays.toString(parts));
                 break;
