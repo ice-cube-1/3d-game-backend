@@ -8,31 +8,84 @@ public class Terrain {
     static List<String> weapons = new ArrayList<>();
     static List<String> blocks = new ArrayList<>();
     static Random random = new Random();
-    static int GRIDSIZE = 80;
+    static int GRIDSIZE = 200;
+
     public Terrain() {
         initializeTerrain();
-        files.write("weapons.txt",weapons);
-        files.write("blocks.txt",blocks);
+        files.write("weapons.txt", weapons);
+        files.write("blocks.txt", blocks);
     }
+
+    ArrayList<ArrayList<Integer>> columns = new ArrayList<>();
 
     // Method to initialize the terrain
     private void initializeTerrain() {
-        for (int i = -GRIDSIZE / 2; i < GRIDSIZE / 2; i += 2) {
-            for (int j = -GRIDSIZE / 2; j < GRIDSIZE / 2; j += 2) {
-                addMore(i, 0, j);
+        for (int i = 0; i < GRIDSIZE / 2; i += 1) {
+            columns.add(new ArrayList<>());
+            for (int j = 0; j < GRIDSIZE / 2; j += 1) {
+                columns.get(i).add(0);
+            }
+        }
+        for (int i = 0; i < 500; i++) {
+            Integer[] seed = {(int) Math.floor(random.nextDouble() * GRIDSIZE/2), (int) Math.floor(random.nextDouble() * GRIDSIZE/2)};
+            columns = addMore(columns, seed);
+        }
+        for (int i = 0; i < GRIDSIZE / 2; i += 1) {
+            for (int j = 0; j < GRIDSIZE / 2; j += 1) {
+                for (int k = 0; k <= columns.get(i).get(j); k++) {
+                    blocks.add((i*2-GRIDSIZE/2) + ", " + k*2 + ", " + (j*2-GRIDSIZE/2));
+                }
+                if (random.nextDouble() < 0.01) {
+                    addWeapon(i*2-GRIDSIZE/2, columns.get(i).get(j)*2 + 2, j*2-GRIDSIZE/2);
+                }
             }
         }
     }
-
-    private void addMore(int i, int z, int j) {
-        double x = random.nextDouble();
-        blocks.add(i + ", " + z + ", " + j);
-        if (x < 0.1) {
-            addMore(i, z + 2, j); // Recursive call
-        } else if (x < 0.15) {
-            weapons.add(i + ", " + z+2 + ", " + j + ", " + Math.floor(random.nextDouble() * 5)+", "+Math.floor(random.nextDouble() * 5));
+    private void addWeapon(int i,int z,int j) {
+        int rarity = 0;
+        if (random.nextDouble() > 0.5) {
+            if (random.nextDouble() > 0.5) {
+                if (random.nextDouble() > 0.5) {
+                    if (random.nextDouble() > (double) 2/3) {
+                        rarity = 4;
+                    } else {
+                        rarity = 3;
+                    }
+                } else {
+                    rarity = 2;
+                }
+            } else {
+                rarity = 1;
+            }
         }
+        int type = (int) Math.floor(random.nextDouble()*7);
+        type = switch (type) {
+            case 5 -> 3;
+            case 6 -> 4;
+            default -> type;
+        };
+        weapons.add(i + ", " + z + ", " + j + ", " + rarity+", "+type);
     }
+    private ArrayList<ArrayList<Integer>> addMore(ArrayList<ArrayList<Integer>> columns, Integer[] seed) {
+        if (seed[1] < 0 || seed[1] >= GRIDSIZE/2 || seed[0] < 0 || seed[0] >= GRIDSIZE/2) {
+            return columns;
+        }
+        int height = columns.get(seed[0]).get(seed[1]);
+        columns.get(seed[0]).set(seed[1], height+1);
+        if (random.nextDouble() < 0.02+((10-height)*0.02)) {
+            columns = addMore(columns, new Integer[]{seed[0]+1,seed[1]});
+        } if (random.nextDouble() < 0.02+((10-height)*0.02)) {
+            columns = addMore(columns, new Integer[]{seed[0]-1,seed[1]});
+        } if (random.nextDouble() < 0.02+((10-height)*0.02)) {
+            columns = addMore(columns, new Integer[]{seed[0],seed[1]+1});
+        } if (random.nextDouble() < 0.02+((10-height)*0.02)) {
+            columns = addMore(columns, new Integer[]{seed[0],seed[1]-1});
+        } if (random.nextDouble() < 0.02) {
+            columns = addMore(columns, new Integer[]{seed[0],seed[1]});
+        }
+        return columns;
+    }
+
     public static List<String> readWeapon() {
         return files.read("weapons.txt");
     }
