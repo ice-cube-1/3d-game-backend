@@ -6,6 +6,7 @@ import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class Server {
     }
     public static org.eclipse.jetty.server.Server newServer(int port)
     {
-        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(port);
+        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(new InetSocketAddress("0.0.0.0", port));
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.setContextPath("/");
         server.setHandler(servletContextHandler);
