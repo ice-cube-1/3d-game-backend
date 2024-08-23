@@ -11,9 +11,13 @@ public class Terrain {
     static int GRIDSIZE = 200;
 
     public Terrain() {
-        initializeTerrain();
-        files.write("weapons.txt", weapons);
-        files.write("blocks.txt", blocks);
+        File file = new File("players.txt");
+        if (!file.exists()) {
+            initializeTerrain();
+            files.write("players.txt",new ArrayList<>());
+            files.write("weapons.txt", weapons);
+            files.write("blocks.txt", blocks);
+        }
     }
 
     ArrayList<ArrayList<Integer>> columns = new ArrayList<>();
@@ -104,8 +108,8 @@ public class Terrain {
     }
     public static String emptySquare() {
         ArrayList<Integer> newCoords = new ArrayList<>();
-        newCoords.add((int) Math.floor(random.nextDouble() * GRIDSIZE - GRIDSIZE / 2));
-        newCoords.add((int) Math.floor(random.nextDouble() * GRIDSIZE - GRIDSIZE / 2));
+        newCoords.add((int) Math.floor(random.nextDouble() * GRIDSIZE - (double) GRIDSIZE / 2));
+        newCoords.add((int) Math.floor(random.nextDouble() * GRIDSIZE - (double) GRIDSIZE / 2));
         int z = 0;
         for (String block : blocks) {
             List<Integer> coords = Arrays.stream(block.split(", ")).map(Integer::parseInt).toList();
