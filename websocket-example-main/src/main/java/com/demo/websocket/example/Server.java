@@ -25,7 +25,7 @@ public class Server {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.setContextPath("/");
         server.setHandler(servletContextHandler);
-        JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (_, container) ->
+        JakartaWebSocketServletContainerInitializer.configure(servletContextHandler, (x, container) ->
         {
             ServerEndpointConfig serverConfig = ServerEndpointConfig.Builder.create(ServerEndpoint.class, "/socket").build();
             container.addEndpoint(serverConfig);
