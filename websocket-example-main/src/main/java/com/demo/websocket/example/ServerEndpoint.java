@@ -28,6 +28,8 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
         this.session = null;
         this.remote = null;
         LOG.info("WebSocket Close: {} - {}", close.getCloseCode(), close.getReasonPhrase());
+        this.stats.writeStats(this.stats.name);
+        sendMessageToOthers("a","remove",this.id);
         World.connections.remove(this);
     }
 
@@ -129,24 +131,26 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
             sendMessage("logged in", "login", "0");
             return;
         }
-        for (ServerEndpoint Player: World.connections) {
-            if (Objects.equals(Player.stats.name, userPass.getFirst())) {
-                if (Objects.equals(Player.stats.password, userPass.get(1))) {
-                    sendMessage(Player.id, "login", Player.id);
-                    this.id = Player.id;
-                    this.stats = Player.stats;
-                    sendMessageToOthers(this.stats.name, "namechange", this.id);
-                } else {
-                    sendMessage("incorrect password", "login", "0");
-                }
-                return;
-            }
+        String result = this.stats.readStats(userPass.get(0),userPass.get(1));
+        switch (result) {
+            case "correct":
+                sendMessage(this.id, "login", this.id);
+                sendMessage(this.stats.sendAll(), "playerStats", "-1");
+                sendMessageToOthers(this.stats.name, "namechange", this.id);
+                break;
+            case "incorrect":
+                sendMessage("incorrect password", "login", "0");
+                break;
+            case "new":
+                this.stats.name = userPass.getFirst();
+                this.stats.password = userPass.get(1);
+                sendMessage(this.stats.sendAll(), "playerStats", "-1");
+                sendMessageToOthers(this.stats.name, "namechange", this.id);
+                this.stats.writeStats(this.stats.name);
+                break;
         }
-        this.stats.name = userPass.getFirst();
-        this.stats.password = userPass.get(1);
-        sendMessage("account "+ userPass.get(0),"login","0");
-        sendMessageToOthers(this.stats.name, "namechange", this.id);
     }
+
     public void moveItem(String currentCoords) {
         String out = "0: moveItem: "+currentCoords+" - "+Terrain.emptySquare();
         for (ServerEndpoint endpoint: World.connections) {

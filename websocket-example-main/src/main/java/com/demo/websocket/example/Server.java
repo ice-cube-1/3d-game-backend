@@ -7,12 +7,14 @@ import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Server {
     public static void main(String[] args) throws Exception
     {
         new Terrain();
+        files.write("players.txt",new ArrayList<>());
         org.eclipse.jetty.server.Server server = newServer(8080);
         server.start();
         server.join();
