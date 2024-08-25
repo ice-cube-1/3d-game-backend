@@ -79,7 +79,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 updateWeapon(parts[2], parts[0]);
                 break;
             case "zspeed":
-                copySpeed(parts[2], "zspeed", Integer.parseInt(parts[0]));
+                sendMessageToOthers(parts[2], "zspeed", parts[0]);
                 break;
             case "weaponPos":
                 sendMessageToOthers(parts[2], parts[1], parts[0]);
@@ -88,7 +88,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 handleLogin(parts[2], parts[0]);
                 break;
             case "hp":
-                copySpeed(parts[2], "hp", Integer.parseInt(parts[0]));
+                sendMessageToOthers(parts[2], "hp", parts[0]);
                 this.stats.hp = parts[2];
                 break;
             case "moveItem":
@@ -96,6 +96,10 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 break;
             case "color":
                 this.stats.color = parts[2];
+                sendMessageToOthers(parts[2], parts[1], parts[0]);
+                break;
+            case "kills":
+                this.stats.kills = parts[2];
                 sendMessageToOthers(parts[2], parts[1], parts[0]);
                 break;
             default:
@@ -122,9 +126,7 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
         World.messages.add(message);
         sendMessageToOthers(message, "message", id);
     }
-    public void copySpeed(String message,String type, int id) {
-        World.connections.get(id).remote.sendText(id+": "+type+": "+message);
-    }
+
     public void handleLogin(String loginInfo, String id) {
         List<String> userPass = List.of(loginInfo.split(" "));
         if (!Objects.equals(this.stats.name, "unknown")) {

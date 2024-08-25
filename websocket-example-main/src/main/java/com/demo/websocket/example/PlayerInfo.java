@@ -11,6 +11,7 @@ public class PlayerInfo {
     public String password = "password";
     public String hp = "40";
     public String color = "255, 255, 255, 255";
+    public String kills = "0";
 
     private ArrayList<ArrayList<String>> getAllInfo() {
         ArrayList<String> currentPlayers = files.read("players.txt");
@@ -39,6 +40,7 @@ public class PlayerInfo {
                     this.armourChoice = player.get(4);
                     this.color = player.get(5);
                     this.password = player.get(6);
+                    this.kills = player.get(7);
                     return "correct";
                 }
                 return "incorrect";
@@ -62,6 +64,6 @@ public class PlayerInfo {
 
 
     public String sendAll() {
-            return "position:"+ position+" - weaponChoice:"+weaponChoice+" - name:"+name+" - hp:"+hp+" - weaponChoice:"+armourChoice +" - color:"+color+" - password:"+password;
+            return "position:"+ position+" - weaponChoice:"+weaponChoice+" - name:"+name+" - hp:"+hp+" - weaponChoice:"+armourChoice +" - color:"+color+" - password:"+password+" - kills:"+kills;
     }
 }
