@@ -25,12 +25,13 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
     public void onClose(Session session, CloseReason close)
     {
         super.onClose(session, close);
-        this.session = null;
-        this.remote = null;
         LOG.info("WebSocket Close: {} - {}", close.getCloseCode(), close.getReasonPhrase());
         this.stats.writeStats(this.stats.name);
+        World.messages.add(this.stats.name+" has left");
+        sendMessageToOthers(this.stats.name+" has left", "message", id);
         sendMessageToOthers("a","remove",this.id);
         World.connections.remove(this);
+
     }
 
     @Override
@@ -75,7 +76,6 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 updatePosition(parts[2], parts[0]);
                 break;
             case "weaponPickup":
-                System.out.println(Arrays.toString(parts));
                 updateWeapon(parts[2], parts[0]);
                 break;
             case "zspeed":
@@ -103,7 +103,6 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
                 sendMessageToOthers(parts[2], parts[1], parts[0]);
                 break;
             default:
-                System.out.println(Arrays.toString(parts));
                 break;
         }
     }
@@ -129,6 +128,10 @@ public class ServerEndpoint extends Endpoint implements MessageHandler.Whole<Str
 
     public void handleLogin(String loginInfo, String id) {
         List<String> userPass = List.of(loginInfo.split(" "));
+        if (userPass.size() == 1) {
+            sendMessage("no password", "login", "0");
+            return;
+        }
         if (!Objects.equals(this.stats.name, "unknown")) {
             sendMessage("logged in", "login", "0");
             return;
